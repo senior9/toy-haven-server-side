@@ -64,26 +64,32 @@ async function run() {
       const email = req.query.email;
       console.log('Email parameter:', req.query.email);
       console.log(req.query.email);
-      if (email) {
         const query = { email: email };
         const cursor = addCarCollection.find(query);
         const result = await cursor.toArray();
         res.send(result);
-      } else {
-        res.status(400).send("Email parameter is missing.");
-      }
+    });
+    //  Get email from get method
+     app.get('/my-collections/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)}
+        const result = await addCarCollection.findOne(query);
+        res.send(result);
     });
 // Update method 
-    app.patch('/my-collection/:id', async(req,res)=>{
+    app.put('/my-collection/:id', async(req,res)=>{
       const id = req.params.id;
       const filterData = {_id: new ObjectId(id)};
+      const options = {upsert:true}
       const updateData = req.body;
       const updateDataFromDelete= {
         $set:{
-          status:updateData.status
+          available_quantity:updateData.available_quantity,
+          price:updateData.price,
+          description:updateData.description,
         }
       }
-      const result = await addCarCollection.updateOne(filterData,updateDataFromDelete);
+      const result = await addCarCollection.updateOne(filterData,updateDataFromDelete,options);
       res.send(result)
     })
 
