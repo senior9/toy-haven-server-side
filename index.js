@@ -73,19 +73,30 @@ async function run() {
         res.status(400).send("Email parameter is missing.");
       }
     });
+// Update method 
+    app.patch('/my-collection/:id', async(req,res)=>{
+      const id = req.params.id;
+      const filterData = {_id: new ObjectId(id)};
+      const updateData = req.body;
+      const updateDataFromDelete= {
+        $set:{
+          status:updateData.status
+        }
+      }
+      const result = await addCarCollection.updateOne(filterData,updateDataFromDelete);
+      res.send(result)
+    })
+
+    // Detele Method 
+    app.delete('/my-collections/:id', async(req,res)=>{
+      const id =req.params.id;
+      console.log(id)
+      const query = {_id: new ObjectId(id)}
+      const result = await addCarCollection.deleteOne(query);
+      res.send(result)
+    })
     
 
-    //  app.get('/new-collections', async (req, res) => {
-    //   console.log(req.query);
-    //   console.log('Email parameter:', req.query.email);
-    //   console.log(req.query.email);
-    //   const email = req.query.email;
-    //   const query = email ? { email: email } : {};
-    //   const cursor = addCarCollection.find(query);
-    //   const result = await cursor.toArray();
-    //   res.send(result);
-    // });
-    
 
      app.post('/new-collections', async(req,res)=>{
        const newCarData = req.body;
