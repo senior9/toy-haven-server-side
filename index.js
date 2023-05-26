@@ -31,7 +31,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
      const carCollection = client.db("carCollection").collection("carData");
      const addCarCollection =client.db("carCollection").collection("addCarData");
     
@@ -62,10 +62,20 @@ async function run() {
     //  Get email from get method
      app.get('/my-collections', async(req, res) => {
       const email = req.query.email;
+      const sortingOrder = req.query.sortOrder;
       console.log('Email parameter:', req.query.email);
       console.log(req.query.email);
         const query = { email: email };
-        const cursor = addCarCollection.find(query);
+        let cursor = addCarCollection.find(query);
+
+        // Sort in ascending order by price
+        if (sortingOrder === 'asc') {
+          cursor = cursor.sort({ price: 1 }); 
+        } 
+        // Sort in descending order by price
+        else if (sortingOrder === 'desc') {
+          cursor = cursor.sort({ price: -1 }); 
+        }
         const result = await cursor.toArray();
         res.send(result);
     });
@@ -77,10 +87,10 @@ async function run() {
         res.send(result);
     });
 // Update method 
-    app.put('/my-collection/:id', async(req,res)=>{
+    app.put('/my-collections/:id', async(req,res)=>{
       const id = req.params.id;
       const filterData = {_id: new ObjectId(id)};
-      const options = {upsert:true}
+      const options = { upsert: true}
       const updateData = req.body;
       const updateDataFromDelete= {
         $set:{
